@@ -1,3 +1,5 @@
+Homepage: https://github.com/jaycorpinc/amazon2irc
+
 Install gem:
 
 `gem install amazon2irc`
