@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
 
   spec.summary       = %q{ Filter Amazon Prime Day, Lightning, and Daily Deals to IRC.}
   spec.description   = %q{Pulls down Amazon RSS feed, checks it for keywords, then sends it along to the irc chat specified. Stores previously seen deals with YAML, outputs new deals every 30s (not including chat delay). A quickly hacked Amazon Prime Day helper.}
-  spec.homepage      = "https://www.reddit.com/r/buildapcsales/comments/6mi0qm/meta_hacked_together_this_little_ruby_toy_for_the/"
+  spec.homepage      = "https://github.com/jaycorpinc/amazon2irc"
   spec.license       = "PIRATE"
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
