@@ -85,5 +85,5 @@ module Amazon2irc
 	def irc_logger item
 		@conn.puts "PRIVMSG #{@opts['channel']} :#{item.title} - #{item.link}"	  				
 	end
-end
+  end
 end
