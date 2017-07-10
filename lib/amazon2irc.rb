@@ -24,8 +24,10 @@ module Amazon2irc
 	def init_persistent_array
 		unless File.exist? File.expand_path "store.yml"
 			open('store.yml', 'w') {|f| YAML.dump(@items, f)}
+		else
+			@items = load_persistent_array
 		end
-		load_persistent_array
+		
 	end
 
 	def load_persistent_array
@@ -85,5 +87,5 @@ module Amazon2irc
 	def irc_logger item
 		@conn.puts "PRIVMSG #{@opts['channel']} :#{item.title} - #{item.link}"	  				
 	end
-  end
+ end
 end
