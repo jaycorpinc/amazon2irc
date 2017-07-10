@@ -1,4 +1,8 @@
 require "amazon2irc/version"
+require 'rss'
+require "socket"
+require "yaml"
+
 
 module Amazon2irc
   class Process
