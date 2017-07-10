@@ -1,4 +1,6 @@
-Install gem: gem install amazon2irc
+Install gem:
+
+`gem install amazon2irc`
 
 
 Demo: 
@@ -22,3 +24,5 @@ opts['chat-delay']=1.5
 opts['scan-delay']=30
 
 Amazon2irc::Process.new(opts)
+
+
