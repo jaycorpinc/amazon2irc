@@ -2,6 +2,8 @@ require "amazon2irc/version"
 require 'rss'
 require "socket"
 require "yaml"
+require 'mechanize'
+require 'nokogiri'
 
 
 module Amazon2irc
@@ -14,8 +16,8 @@ module Amazon2irc
 		connect
 		wait
 		loop do
-			scanning
-			spidering
+			scanning if opts['rss']
+			spidering if opts['spidering']
 			write_persistent_array
 			sleep @opts['scan-delay']
 		end
@@ -103,7 +105,7 @@ module Amazon2irc
 	end
 
 	def irc_logger2 item
-		@conn.puts "PRIVMSG #{@opts['channel']} :#{item}"	  				
+		@conn.puts "PRIVMSG #{@opts['channel']} :#{item}/ref=sr_1_2?s=prime-day&psr=PDAY&ie=UTF8&qid=1499752396&sr=1-2&keywords="	  				
 	end
  end
 
@@ -114,10 +116,11 @@ module Amazon2irc
 class AmazonMechanize
 	def self.scan keyword
 		begin
+			items = []
 			agent = Mechanize.new
 			agent.max_history = nil # unlimited history
 			html = agent.get("https://www.amazon.com/s/ref=nb_sb_noss?url=search-alias%3Dprime-day&field-keywords=#{keyword}")
-			items = []
+			
 			loop do
 					doc = Nokogiri::HTML::Document.parse(html.body)
 
@@ -128,22 +131,21 @@ class AmazonMechanize
 							last_title=a['title'] unless a['title'].to_s.length == 0
 							offer_link = a['href'] unless (a.to_s.length == 0 || (a['href'].include?("offer")) || (a['href'].include?("Reviews"))  || (a['href'].include?("void(0)")) || (a['href'].include?("Promotions")) )
 						end
-						items.push("#{last_title} : #{offer_link}")
+						items.push("#{last_title} : #{offer_link}") if last_title.downcase.include? keyword.downcase
 					end
 
 					next_page=false
 					html.links.each do |l|
 						next_page=true if l.text.include? 'Next Page'
-						sleep 3 if l.text.include? 'Next Page'
+						sleep 5 if l.text.include? 'Next Page'
 						html = l.click if ((l.text.include? 'Next Page') && (l.href.to_s.length > 10))
 						next  if l.text.include? 'Next Page'
 					end
 				return items if next_page == false
 			end
 		rescue => error
-			sleep 10
-			puts 'Error! #{error}'
-			retry
+			puts "Error! #{error}"
+			return items
 		end
 	end
 end

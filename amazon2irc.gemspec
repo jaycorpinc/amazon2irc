@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["jlee@ruby.im"]
 
   spec.summary       = %q{ Filter Amazon Prime Day, Lightning, and Daily Deals to IRC.}
-  spec.description   = %q{Pulls down Amazon RSS feed, checks it for keywords, then sends it along to the irc chat specified. Stores previously seen deals with YAML, outputs new deals every 30s (not including chat delay). A quickly hacked Amazon Prime Day helper.}
+  spec.description   = %q{Pulls down Amazon deals via spidering or RSS feed, checks it for keywords, then sends it along to the irc chat specified. Stores previously seen deals with YAML, outputs new deals every 30s (not including chat delay). A quickly hacked Amazon Prime Day helper.}
   spec.homepage      = "https://github.com/jaycorpinc/amazon2irc"
   spec.license       = "PIRATE"
 
