@@ -15,6 +15,7 @@ module Amazon2irc
 		wait
 		loop do
 			scanning
+			spidering
 			write_persistent_array
 			sleep @opts['scan-delay']
 		end
@@ -61,6 +62,19 @@ module Amazon2irc
 		@conn.puts "PRIVMSG #{@opts['channel']} :Bot Scanned: #{@opts['keywords'].flatten}"
 	end
 
+
+	def spidering
+		@opts['keywords'].each do |item|
+			AmazonMechanize.scan(item).each do |res|
+				unless @items.include? res
+					irc_logger2(res)
+					@items.push("#{res}")
+  					sleep @opts['chat-delay']
+				end
+			end
+		end
+	end
+
 	def pullDeals
 		rss = RSS::Parser.parse('https://rssfeeds.s3.amazonaws.com/goldbox', false)
 		rss.items
@@ -87,5 +101,52 @@ module Amazon2irc
 	def irc_logger item
 		@conn.puts "PRIVMSG #{@opts['channel']} :#{item.title} - #{item.link}"	  				
 	end
+
+	def irc_logger2 item
+		@conn.puts "PRIVMSG #{@opts['channel']} :#{item}"	  				
+	end
  end
+
+
+
+
+
+class AmazonMechanize
+	def self.scan keyword
+		begin
+			agent = Mechanize.new
+			agent.max_history = nil # unlimited history
+			html = agent.get("https://www.amazon.com/s/ref=nb_sb_noss?url=search-alias%3Dprime-day&field-keywords=#{keyword}")
+			items = []
+			loop do
+					doc = Nokogiri::HTML::Document.parse(html.body)
+
+					doc.xpath('//*[@class="s-item-container"]').each do |item|
+						last_title=''
+						offer_link=''
+						item.css('a').each do |a|
+							last_title=a['title'] unless a['title'].to_s.length == 0
+							offer_link = a['href'] unless (a.to_s.length == 0 || (a['href'].include?("offer")) || (a['href'].include?("Reviews"))  || (a['href'].include?("void(0)")) || (a['href'].include?("Promotions")) )
+						end
+						items.push("#{last_title} : #{offer_link}")
+					end
+
+					next_page=false
+					html.links.each do |l|
+						next_page=true if l.text.include? 'Next Page'
+						sleep 3 if l.text.include? 'Next Page'
+						html = l.click if ((l.text.include? 'Next Page') && (l.href.to_s.length > 10))
+						next  if l.text.include? 'Next Page'
+					end
+				return items if next_page == false
+			end
+		rescue => error
+			sleep 10
+			puts 'Error! #{error}'
+			retry
+		end
+	end
+end
+
+
 end

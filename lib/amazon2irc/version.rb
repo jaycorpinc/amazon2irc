@@ -1,3 +1,3 @@
 module Amazon2irc
-  VERSION = "7.10.2017.1853"
+  VERSION = "7.11.2017.0153"
 end
