@@ -16,8 +16,8 @@ module Amazon2irc
 		connect
 		wait
 		loop do
-			scanning if opts['rss']
-			spidering if opts['spidering']
+			scanning if @opts['rss']
+			spidering if @opts['spidering']
 			write_persistent_array
 			sleep @opts['scan-delay']
 		end
@@ -67,14 +67,18 @@ module Amazon2irc
 
 	def spidering
 		@opts['keywords'].each do |item|
+			@conn.puts "PRIVMSG #{@opts['channel']} :Bot Spidering: #{item}"
 			AmazonMechanize.scan(item).each do |res|
 				unless @items.include? res
 					irc_logger2(res)
 					@items.push("#{res}")
   					sleep @opts['chat-delay']
+
 				end
 			end
+			@conn.puts "PRIVMSG #{@opts['channel']} :Bot Spidered: #{item}"
 		end
+
 	end
 
 	def pullDeals
